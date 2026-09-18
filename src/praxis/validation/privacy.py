@@ -7,7 +7,7 @@ Detected (all → ERROR POSSIBLE_SECRET / POSSIBLE_CREDENTIAL_FILE):
     tokens        ghp_…, xoxb-…, gho_…, glpat-…
     passwords     password = …, passwd: …, api_key = …
     emails        name@example.com
-    phones        +86 138…, 13812345678
+    phones        +86 138-0000-0000  (hyphenated example)
     filenames     *.pem, *.key, id_rsa, credentials.*, .env
 
 The scan is deliberately shallow: it is a tripwire that fails CI, not a
