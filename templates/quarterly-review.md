@@ -53,3 +53,15 @@ updated_at: 2026-09-17
 ## Direction Drift
 
 ## Next Quarter Focus
+
+# Actual Outcome
+
+（本季度实际结果，与预测/目标对照）
+
+# Lessons
+
+（本季度最重要的教训）
+
+# Principle Impact
+
+（本季度产生的原则变更，无则留空）

@@ -16,6 +16,8 @@ from pathlib import Path
 from praxis.config import find_repo_root, load_config
 from praxis.core.entity import Entity
 from praxis.core.index import Repository
+from praxis.search.metadata import matches_metadata
+from praxis.search.text import matches_text
 
 
 def entity_matches(
@@ -27,34 +29,10 @@ def entity_matches(
     related: str | None = None,
 ) -> bool:
     """Whether one entity satisfies every supplied filter."""
-    if entity_type and entity.type != entity_type.rstrip("s"):
+    if not matches_metadata(entity, entity_type, status, domain, related):
         return False
-    if status and str(entity.metadata.get("status", "")) != status:
-        return False
-    if domain:
-        domains = [str(d).lower() for d in entity.metadata.get("domains", []) or []]
-        single = entity.metadata.get("domain")
-        if single:
-            domains.append(str(single).lower())
-        if domain.lower() not in domains:
-            return False
-    if related:
-        haystack: list[str] = []
-        for key, value in entity.metadata.items():
-            if isinstance(value, list):
-                haystack.extend(str(v) for v in value)
-            elif isinstance(value, str):
-                haystack.append(value)
-        if related not in haystack:
-            return False
     if query:
-        needle = query.lower()
-        haystack = " ".join(
-            [str(v) for v in entity.metadata.values() if isinstance(v, (str, int))]
-            + [entity.body, entity.id]
-        ).lower()
-        if needle not in haystack:
-            return False
+        return matches_text(entity, query)
     return True
 
 
