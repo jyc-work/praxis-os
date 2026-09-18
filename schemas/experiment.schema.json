@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://praxis.dev/schemas/experiment.schema.json",
+  "title": "Experiment",
+  "description": "A small, reversible, measurable test used instead of speculation.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id", "type", "title", "status", "hypothesis", "created_at", "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^EXPERIMENT-[A-Z]+-[0-9]{3}$"
+    },
+    "type": { "const": "experiment" },
+    "title": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["planned", "running", "completed", "abandoned"] },
+    "hypothesis": { "type": "string", "minLength": 1 },
+    "start_date": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "end_date": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "related_decision": { "type": "array", "items": { "type": "string" } },
+    "related_principles": { "type": "array", "items": { "type": "string" } },
+    "metrics": { "type": "array", "items": { "type": "string" } },
+    "created_at": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "updated_at": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    }
+  }
+}

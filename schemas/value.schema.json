@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://praxis.dev/schemas/value.schema.json",
+  "title": "Value",
+  "description": "A claimed or revealed personal value. Blocks claimed from revealed; only the human may change them.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id", "type", "name", "status", "priority", "domains", "confidence",
+    "created_at", "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^VALUE-[A-Z]+-[0-9]{3}$",
+      "description": "Stable ID, never changes with title edits."
+    },
+    "type": { "const": "value" },
+    "name": { "type": "string", "minLength": 1 },
+    "name_zh": { "type": "string" },
+    "status": { "enum": ["active", "inactive", "retired"] },
+    "priority": { "enum": ["low", "medium", "high"] },
+    "domains": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "confidence": { "enum": ["low", "medium", "high"] },
+    "conflicts_with": { "type": "array", "items": { "type": "string" } },
+    "related_values": { "type": "array", "items": { "type": "string" } },
+    "created_at": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "updated_at": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    }
+  }
+}

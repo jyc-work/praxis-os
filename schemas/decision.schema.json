@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://praxis.dev/schemas/decision.schema.json",
+  "title": "Decision",
+  "description": "A structured decision journal entry. Final Judgment is human-owned.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id", "type", "title", "status", "domain", "confidence", "created_at", "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DECISION-[A-Z]+-[0-9]{3}$"
+    },
+    "type": { "const": "decision" },
+    "title": { "type": "string", "minLength": 1 },
+    "status": {
+      "enum": ["considering", "decided", "executing", "reviewed", "abandoned"]
+    },
+    "domain": { "type": "string", "minLength": 1 },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "decision_date": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "related_values": { "type": "array", "items": { "type": "string" } },
+    "related_models": { "type": "array", "items": { "type": "string" } },
+    "related_principles": { "type": "array", "items": { "type": "string" } },
+    "experiments": { "type": "array", "items": { "type": "string" } },
+    "review_dates": {
+      "type": "array",
+      "items": {
+        "type": ["string", "null"],
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      }
+    },
+    "created_at": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "updated_at": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    }
+  }
+}
