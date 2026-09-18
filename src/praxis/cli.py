@@ -26,9 +26,34 @@ def _build_parser() -> argparse.ArgumentParser:
     validate_p.add_argument(
         "--root", default=None, help="repository root (default: nearest praxis.yaml)"
     )
-    sub.add_parser("search", help="search metadata and markdown bodies")
-    sub.add_parser("new", help="create a new entity from a template")
-    sub.add_parser("doctor", help="repository health report")
+
+    search_p = sub.add_parser("search", help="search metadata and markdown bodies")
+    search_p.add_argument("query", nargs="?", default=None, help="full-text query")
+    search_p.add_argument("--root", default=None)
+    search_p.add_argument("--type", default=None, help="entity type filter")
+    search_p.add_argument("--status", default=None, help="status filter")
+    search_p.add_argument("--domain", default=None, help="domain filter")
+    search_p.add_argument("--related", default=None, help="related entity ID")
+
+    new_p = sub.add_parser("new", help="create a new entity from a template")
+    new_p.add_argument(
+        "entity_type",
+        choices=["value", "model", "principle", "decision", "experiment", "review"],
+    )
+    new_p.add_argument("--root", default=None)
+    new_p.add_argument("--title", default="Untitled", help="entity title")
+    new_p.add_argument("--domain", default=None, help="domain (e.g. career, life)")
+    new_p.add_argument(
+        "--type", dest="review_type", default=None,
+        help="review type: weekly/monthly/quarterly/annual/decision",
+    )
+    new_p.add_argument(
+        "--model-type", default=None,
+        help="model type: thinker/philosophy/mental-model/world-model",
+    )
+
+    doctor_p = sub.add_parser("doctor", help="repository health report")
+    doctor_p.add_argument("--root", default=None)
     return parser
 
 
