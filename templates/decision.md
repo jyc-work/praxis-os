@@ -95,4 +95,8 @@ updated_at: 2026-09-17
 - 90 天后：
 - 365 天后：
 
+# Final Judgment
+
 > Final Judgment: Human Required
+>
+> （Human 决定后填写。Agent 不得代写 Final Judgment。）

@@ -159,14 +159,10 @@ def _write_entity(config, entity_type: str, metadata: dict, body: str) -> Path:
     filename = f"{metadata['id']}-{slugify(str(metadata.get('title') or metadata.get('name') or entity_type))}.md"
     path = base_dir / filename
 
-    if not path.exists():
-        path.write_text(body, encoding="utf-8")
+    if path.exists():
+        raise IdError(f"target file already exists: {path}")
+    path.write_text(body, encoding="utf-8")
     return path
-
-
-def _check_id_available(existing_ids: list[str], id_: str) -> None:
-    if id_ in existing_ids:
-        raise IdError(f"ID {id_!r} already exists")
 
 
 def build_entity(
@@ -208,8 +204,6 @@ def build_entity(
         metadata["review_type"] = review_type or "weekly"
 
     validate_id(entity_type, new_id)
-    if new_id in existing:
-        raise IdError(f"ID {new_id!r} already exists")
 
     template = _resolve_template(config, entity_type, review_type)
     text = template.read_text(encoding="utf-8")

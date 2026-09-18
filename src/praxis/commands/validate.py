@@ -56,10 +56,11 @@ def run_validation(root: Path) -> tuple[list[ValidationIssue], Repository]:
     config = load_config(root)
     repo = Repository.load(config)
     issues: list[ValidationIssue] = []
+    schema_dir = root / "schemas"
 
     for entity in repo.all_entities:
-        issues.extend(validate_entity_schema(entity))
-        issues.extend(validate_semantic(entity))
+        issues.extend(validate_entity_schema(entity, schema_dir=schema_dir))
+        issues.extend(validate_semantic(entity, options=config.validation))
 
     repo_issues = validate_repository(repo)
     issues.extend(repo_issues)

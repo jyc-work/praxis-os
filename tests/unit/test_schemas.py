@@ -11,6 +11,8 @@ import jsonschema
 import pytest
 import yaml
 
+from praxis.validation.schema import validate_entity_schema
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = REPO_ROOT / "schemas"
 TEMPLATES = REPO_ROOT / "templates"
@@ -177,3 +179,19 @@ def test_data_model_doc_mentions_all_six_entities() -> None:
     doc = (REPO_ROOT / "docs" / "data-model.md").read_text(encoding="utf-8")
     for entity_type in ENTITY_TYPES:
         assert entity_type in doc
+
+
+def test_validate_entity_schema_accepts_explicit_schema_dir() -> None:
+    """Schema resolution prefers a repository's schemas/ directory and never
+    hard-requires the source tree (wheel-install safety)."""
+    from praxis.core.parser import parse_file
+
+    entity = parse_file(SCHEMAS.parent / "tests" / "fixtures" / "valid_repo" / "values" / "VALUE-LIFE-001-autonomy.md")
+    # explicit real dir → clean
+    issues_ok = validate_entity_schema(entity, schema_dir=SCHEMAS)
+    assert issues_ok == []
+    # missing/empty dir → falls back gracefully, never a crash
+    issues_fallback = validate_entity_schema(
+        entity, schema_dir=Path(__file__).parent / "_nonexistent"
+    )
+    assert all(i.code != "UNKNOWN_SCHEMA" for i in issues_fallback)

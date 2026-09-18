@@ -90,3 +90,60 @@ def test_planned_review_not_flagged_hard() -> None:
     issues = validate_semantic(entity)
     # planned review may lack outcome data: only INFO, never WARNING/ERROR
     assert all(i.severity != Severity.WARNING for i in issues)
+
+
+def test_semantic_options_disable_sections() -> None:
+    """principles without counter evidence/boundary stop warning when toggled off."""
+    tmp = Path(__file__).parent / "_toggled.md"
+    tmp.write_text(
+        "---\nid: PRINCIPLE-CAREER-097\ntype: principle\ntitle: x\n"
+        "status: candidate\nconfidence: low\ndomains: [career]\n"
+        "created_at: 2026-09-17\nupdated_at: 2026-09-17\n---\n\n# Principle\n\n"
+        "## Statement\n\nok\n\n## Why\n\nok\n\n## Evidence\n\nok\n\n"
+        "## Trigger\n\nok\n\n## Action Rule\n\nok\n\n## Revision History\n\nv1\n",
+        encoding="utf-8",
+    )
+    try:
+        entity = parse_file(tmp)
+        # default: counter evidence and boundary both missing → warnings
+        default_issues = validate_semantic(entity)
+        assert any("COUNTER_EVIDENCE" in i.code for i in default_issues)
+        assert any("BOUNDARY" in i.code for i in default_issues)
+        # toggled off: no warnings from those sections
+        off = validate_semantic(
+            entity,
+            options={
+                "require_counter_evidence": False,
+                "require_principle_boundary": False,
+            },
+        )
+        assert not any("COUNTER_EVIDENCE" in i.code for i in off)
+        assert not any("BOUNDARY" in i.code for i in off)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+
+
+def test_final_judgment_empty_info_when_considering() -> None:
+    """A considering decision with an empty Final Judgment is INFO, not WARNING."""
+    from praxis.core.parser import parse_file as parse
+
+    tmp = Path(__file__).parent / "_considering.md"
+    tmp.write_text(
+        "---\nid: DECISION-CAREER-097\ntype: decision\ntitle: x\n"
+        "status: considering\ndomain: career\nconfidence: 50\n"
+        "created_at: 2026-09-17\nupdated_at: 2026-09-17\n---\n\n# Situation\n\nok\n\n"
+        "# Facts\n\nok\n\n# Unknowns\n\nok\n\n# Emotion\n\nok\n\n"
+        "# Next Action\n\nok\n\n# Final Judgment\n\n（待填写）\n\n"
+        "# Prediction\n\nok\n",
+        encoding="utf-8",
+    )
+    try:
+        entity = parse(tmp)
+        issues = validate_semantic(entity)
+        final_judgment = [i for i in issues if "FINAL_JUDGMENT" in i.code]
+        assert final_judgment, "expected a Final Judgment issue"
+        assert all(i.severity == Severity.INFO for i in final_judgment)
+    finally:
+        if tmp.exists():
+            tmp.unlink()

@@ -39,6 +39,11 @@ praxis = "praxis.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# ship a default copy of the JSON Schemas so `praxis validate` still works
+# when the package is installed from a wheel without the source tree
+[tool.setuptools.data-files]
+"praxis_data/schemas" = ["schemas/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

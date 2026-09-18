@@ -18,8 +18,6 @@ from praxis.core.ids import TYPE_PREFIX, validate_id
 from praxis.core.relations import resolve_relations
 from praxis.validation.issue import Severity, ValidationIssue
 
-REVIEW_FIELDS = {"target", "decision_id"}
-
 
 def validate_repository(repo: Repository) -> list[ValidationIssue]:
     """Run all Level-2 checks against an indexed repository."""
@@ -91,20 +89,32 @@ def validate_repository(repo: Repository) -> list[ValidationIssue]:
 
     # -- relations -----------------------------------------------------
     for broken in resolve_relations(repo.all_entities, known_ids):
-        severity = (
-            Severity.ERROR
-            if broken.field not in REVIEW_FIELDS
-            else Severity.ERROR
-        )
         issues.append(
             ValidationIssue(
-                severity,
+                Severity.ERROR,
                 "BROKEN_RELATION",
                 f"field {broken.field!r} references missing ID {broken.target_id!r}",
                 path=Path(broken.source_path),
                 entity_id=broken.source_id,
             )
         )
+
+    # -- decision reviews must name their target -----------------------
+    for entity in repo.by_type("review"):
+        if (
+            str(entity.metadata.get("review_type", "")) == "decision"
+            and not entity.metadata.get("target")
+            and entity.metadata.get("status") == "completed"
+        ):
+            issues.append(
+                ValidationIssue(
+                    Severity.ERROR,
+                    "MISSING_REVIEW_TARGET",
+                    "completed decision review has no target decision",
+                    path=entity.path,
+                    entity_id=entity.id,
+                )
+            )
 
     return issues
 

@@ -102,6 +102,24 @@ def test_create_review_by_type(repo: Path) -> None:
     entity = parse_file(path)
     assert entity.metadata["review_type"] == "weekly"
     assert validate_entity_schema(entity) == []
+    # planned status: empty sections must not produce hard warnings
+    from praxis.validation.semantic import validate_semantic
+
+    assert all(i.severity.name not in ("ERROR", "FATAL", "WARNING")
+               for i in validate_semantic(entity))
+
+
+def test_new_decision_template_has_final_judgment_heading(repo: Path) -> None:
+    """Review follow-up: `praxis new decision` must reference Final Judgment."""
+    from praxis.validation.semantic import validate_semantic
+
+    config = load_config(repo)
+    path = build_entity(config, "decision", "Test Decision", "career", None, None)
+    text = path.read_text(encoding="utf-8")
+    assert "# Final Judgment" in text
+    entity = parse_file(path)
+    issues = validate_semantic(entity)
+    assert not any("FINAL_JUDGMENT" in i.code and "MISSING" in i.code for i in issues)
 
 
 def test_invalid_domain_rejected_no_file(repo: Path) -> None:

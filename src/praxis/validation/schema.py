@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import jsonschema
@@ -10,28 +11,48 @@ import jsonschema
 from praxis.core.entity import Entity
 from praxis.validation.issue import Severity, ValidationIssue
 
-SCHEMA_DIR = Path(__file__).resolve().parents[3] / "schemas"
-
-_SCHEMA_CACHE: dict[str, dict] = {}
-
-
-def load_schema(entity_type: str) -> dict:
-    """Load one JSON Schema (cached)."""
-    if entity_type not in _SCHEMA_CACHE:
-        path = SCHEMA_DIR / f"{entity_type}.schema.json"
-        if not path.is_file():
-            raise FileNotFoundError(f"missing schema for entity type {entity_type!r}")
-        with path.open(encoding="utf-8") as fh:
-            _SCHEMA_CACHE[entity_type] = json.load(fh)
-    return _SCHEMA_CACHE[entity_type]
+#: fallback when no repository root / schema dir is supplied (tests, tooling)
+_SCHEMA_DIR = Path(__file__).resolve().parents[3] / "schemas"
 
 
-def validate_entity_schema(entity: Entity) -> list[ValidationIssue]:
-    """Validate one entity's frontmatter against its JSON Schema."""
+def _installed_schema_dir() -> Path:
+    """Where the packaged default schemas land (wheel installs)."""
+    for prefix in (sys.prefix, sys.base_prefix):
+        candidate = Path(prefix) / "praxis_data" / "schemas"
+        if candidate.is_dir():
+            return candidate
+    return _SCHEMA_DIR
+
+
+def _resolve_schema_dir(schema_dir: Path | None) -> Path:
+    """Priority: repository schemas/ → packaged defaults → source tree."""
+    if schema_dir is not None and schema_dir.is_dir():
+        return schema_dir
+    return _installed_schema_dir()
+
+
+def load_schema(entity_type: str, schema_dir: Path | None = None) -> dict:
+    """Load one JSON Schema (cached per directory)."""
+    base = _resolve_schema_dir(schema_dir)
+    path = base / f"{entity_type}.schema.json"
+    if not path.is_file():
+        raise FileNotFoundError(f"missing schema for entity type {entity_type!r}")
+    with path.open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def validate_entity_schema(
+    entity: Entity, schema_dir: Path | None = None
+) -> list[ValidationIssue]:
+    """Validate one entity's frontmatter against its JSON Schema.
+
+    ``schema_dir`` points at a repository's ``schemas/`` folder so schemas work
+    even when the package is installed from a wheel (schemas live in the repo).
+    """
     issues: list[ValidationIssue] = []
 
     try:
-        schema = load_schema(entity.type)
+        schema = load_schema(entity.type, schema_dir=schema_dir)
     except FileNotFoundError as exc:
         issues.append(
             ValidationIssue(

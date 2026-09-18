@@ -3,7 +3,7 @@ id: REVIEW-WEEKLY-001
 type: review
 review_type: weekly
 target: []
-status: completed
+status: planned
 review_date: 2026-09-17
 principles_changed: []
 created_at: 2026-09-17

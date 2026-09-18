@@ -82,27 +82,43 @@ def section_is_effectively_empty(content: str) -> bool:
     return not substantive
 
 
-def validate_semantic(entity: Entity) -> list[ValidationIssue]:
-    """Run Level-3 semantic checks on one entity."""
+#: sections that can be skipped when their config toggle is off
+OPTION_TOGGLE_SECTIONS: dict[str, str] = {
+    "require_counter_evidence": "Counter Evidence",
+    "require_principle_boundary": "Boundary",
+    "require_decision_next_action": "Next Action",
+}
+
+
+def _option_enabled(options: dict | None, key: str) -> bool:
+    if not options:
+        return True
+    return bool(options.get(key, True))
+
+
+def validate_semantic(entity: Entity, options: dict | None = None) -> list[ValidationIssue]:
+    """Run Level-3 semantic checks on one entity.
+
+    ``options`` maps praxis.yaml ``validation.*`` flags to booleans; a section
+    whose toggle is disabled is not checked.
+    """
     issues: list[ValidationIssue] = []
     sections = extract_sections(entity.body)
 
     if entity.type not in SECTION_REQUIREMENTS:
         return issues
 
-    # A planned decision/experiment may legitimately lack data, but the
-    # required sections must still exist for decisions and experiments.
     for section in SECTION_REQUIREMENTS[entity.type]:
+        # honor config toggles (e.g. require_counter_evidence)
+        if _section_toggled_off(section, options):
+            continue
+
         content = sections.get(section)
         if content is None:
             issues.append(_issue(entity, section, "MISSING", "section not found"))
             continue
         if section_is_effectively_empty(content):
-            severity = (
-                Severity.INFO
-                if entity.type == "review" and _review_not_completed(entity)
-                else Severity.WARNING
-            )
+            severity = _empty_severity(entity, section)
             issues.append(
                 _issue(
                     entity,
@@ -114,6 +130,28 @@ def validate_semantic(entity: Entity) -> list[ValidationIssue]:
             )
 
     return issues
+
+
+def _section_toggled_off(section: str, options: dict | None) -> bool:
+    for option_key, option_section in OPTION_TOGGLE_SECTIONS.items():
+        if option_section == section and not _option_enabled(options, option_key):
+            return True
+    return False
+
+
+def _empty_severity(entity: Entity, section: str) -> Severity:
+    """Severity for an empty required section, depending on entity state."""
+    if entity.type == "review" and _review_not_completed(entity):
+        return Severity.INFO
+    # a considering decision has not produced a Final Judgment yet — that is
+    # expected, not a violation (but for decided/executing/reviewed it is)
+    if (
+        entity.type == "decision"
+        and section == "Final Judgment"
+        and entity.metadata.get("status") == "considering"
+    ):
+        return Severity.INFO
+    return Severity.WARNING
 
 
 def _review_not_completed(entity: Entity) -> bool:
