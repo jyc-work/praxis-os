@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "praxis-os"
-version = "0.1.0"
+version = "0.1.0rc1"
 description = "An open-source personal philosophy & decision operating system: values, principles, decisions, experiments and feedback as versioned files."
 readme = "README.md"
 requires-python = ">=3.12"

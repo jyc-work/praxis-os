@@ -12,7 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 def test_package_import() -> None:
     import praxis  # noqa: F401
 
-    assert praxis.__version__ == "0.1.0"
+    assert praxis.__version__.startswith("0.1.0")
 
 
 def test_cli_entry_help() -> None:

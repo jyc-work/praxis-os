@@ -12,6 +12,8 @@ from __future__ import annotations
 import argparse
 import sys
 
+from praxis import __version__
+
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -19,7 +21,7 @@ def _build_parser() -> argparse.ArgumentParser:
         description="PraxisOS — personal philosophy & decision operating system.",
     )
     parser.add_argument(
-        "--version", action="version", version="%(prog)s 0.1.0"
+        "--version", action="version", version=f"%(prog)s {__version__}"
     )
     sub = parser.add_subparsers(dest="command", metavar="COMMAND")
     validate_p = sub.add_parser("validate", help="validate the whole repository")

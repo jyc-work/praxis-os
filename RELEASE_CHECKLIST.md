@@ -4,6 +4,10 @@ Use this list before tagging any release.
 
 > **原则：如果 v0.1 的思想闭环本身不好用，任何 AI 和 RAG 都只是放大一个不好用的系统。**
 
+## v0.1-rc（当前，engineering complete）
+
+已完成：打 tag `v0.1-rc` 并 push（**不打 GitHub Release**）；进入 Personal Dogfooding。
+
 ## Code & quality
 
 - [ ] All tests pass: `pytest`

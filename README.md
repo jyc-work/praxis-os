@@ -76,7 +76,7 @@ Agents may **never** promote a principle to `validated` or `core`. Only the huma
 ## Quick Start
 
 ```bash
-git clone https://github.com/nomiga-ww/praxis-os.git
+git clone https://github.com/jyc-work/praxis-os.git
 cd praxis-os
 
 python -m venv .venv
@@ -173,10 +173,17 @@ Hard constraints: the human owns `Final Judgment`; the agent never upgrades a pr
 
 ## Roadmap
 
-- **v0.1 (current)** — Foundation: schemas, templates, parser, validator, CLI, 4 skills, demo persona, CI.
+- **v0.1-rc (current)** — Engineering Complete: schemas, templates, parser,
+  validator, CLI, 4 skills, demo persona, CI. 独立代码审查已通过。
+- **Personal Dogfooding (Phase 8)** — 用真实人生数据连续使用几周，不增加大功能；
+  重点观察记录成本、Principle/Value 混淆、Decision 模板轻重、Relation 实用性、
+  Review 是否真正修订原则、Skill 是否减少思考负担。→ 真实问题 → v0.1.0
+- **v0.1.0** — 首个稳定开源版本（Release Gate：clean clone、双平台、隐私历史检查…）
+- **v0.1.x** — 只修体验 / Schema / Validator 问题
 - **v0.2** — Local intelligence: full-text + metadata search, relation graph, review reminders, stats.
 - **v0.3** — AI layer: provider-agnostic LLM adapter, extraction and analysis helpers.
-- **v0.4** — Personal retrieval: hybrid search, embeddings, reranking.
+- **v0.4** — Personal retrieval: hybrid search, embeddings, reranking（进一步后置：
+  先积累值得 Retrieval 的长期个人数据）
 - **v0.5** — Integrations: Notion/Obsidian views, calendar, career KB.
 - **v1.0** — A dependable personal decision OS.
 
