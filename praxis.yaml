@@ -1,0 +1,21 @@
+version: 1
+
+paths:
+  constitution: constitution
+  values: values
+  models: models
+  principles: principles
+  decisions: decisions
+  experiments: experiments
+  reviews: reviews
+
+privacy:
+  ignored:
+    - private/**
+    - data/private/**
+    - journals/private/**
+
+validation:
+  require_counter_evidence: true
+  require_principle_boundary: true
+  require_decision_next_action: true

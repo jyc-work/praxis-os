@@ -1,0 +1,28 @@
+# --- PraxisOS private data (never commit) ---
+/private/**
+/data/private/**
+/journals/private/**
+.env
+*.secret.*
+credentials.*
+*_credentials*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# --- Editors / OS ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
