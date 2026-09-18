@@ -22,7 +22,10 @@ def _build_parser() -> argparse.ArgumentParser:
         "--version", action="version", version="%(prog)s 0.1.0"
     )
     sub = parser.add_subparsers(dest="command", metavar="COMMAND")
-    sub.add_parser("validate", help="validate the whole repository")
+    validate_p = sub.add_parser("validate", help="validate the whole repository")
+    validate_p.add_argument(
+        "--root", default=None, help="repository root (default: nearest praxis.yaml)"
+    )
     sub.add_parser("search", help="search metadata and markdown bodies")
     sub.add_parser("new", help="create a new entity from a template")
     sub.add_parser("doctor", help="repository health report")
