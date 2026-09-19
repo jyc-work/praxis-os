@@ -102,6 +102,22 @@ that produces information within 24 hours.
 Do not read `private/`, do not commit it, do not echo it into other files.
 If a secret-looking pattern appears, flag it and stop.
 
+## Public Repository Boundary
+
+**Never write real autobiographical evidence into the public repository.**
+
+This repository is public. It may only contain `PUBLIC_FRAMEWORK` content
+(schemas, skills, templates, docs, methodology) and `ANONYMIZED_EXAMPLE`
+content (real-derived material generalized beyond recognition).
+
+- real workplace events, real financial data, real relationship details and
+  identifiable personal context belong **only** in the local private
+  `PraxisOS-data` repository (no remote by default);
+- public examples must be synthetic or explicitly anonymized/generalized;
+- before committing anything derived from real experience: anonymize → review →
+  commit;
+- see `docs/adr/004-public-vs-private-data-boundary.md` and `docs/privacy.md`.
+
 ## Minimalism
 
 **Do not add infrastructure without demonstrated need.**
